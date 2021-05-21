@@ -187,6 +187,6 @@ func (r *Rotor) openNew() error {
 
 func getTimeToNewRotation() time.Duration {
 	now := time.Now()
-	midnight := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	return time.Second + midnight.Sub(now)
+	midnight := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 1, 0, time.Local)
+	return midnight.Sub(now)
 }
