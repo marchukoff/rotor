@@ -5,6 +5,6 @@ import (
 	"testing"
 )
 
-func TestRotor_ImplementsWriteCloser(t *testing.T) {
+func TestRotor_ImplementsWriteCloser(_ *testing.T) {
 	var _ io.WriteCloser = new(Rotor)
 }

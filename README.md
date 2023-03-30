@@ -1,4 +1,4 @@
-#rotor
+# rotor
 
 It's a rolling *io.WriteCloser* for file loggers
 
@@ -7,20 +7,20 @@ It's a rolling *io.WriteCloser* for file loggers
 package main
 
 import (
-	"github.com/marchukoff/rotor"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"io"
 	"os"
 	"time"
+
+	"github.com/marchukoff/rotor"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 func main() {
-	rw := rotor.NewRotor(
-		rotor.WithFileName("test"),
-		rotor.WithFilePath("logs"),
-		rotor.WithKeepFiles(2),
-	)
+	rw, err := rotor.New("test", "log", rotor.PostfixTime(time.Kitchen))
+	if err != nil {
+		panic(err)
+	}
 	cfg := zap.NewProductionEncoderConfig()
 	cfg.TimeKey = "time"
 	cfg.EncodeTime = zapcore.RFC3339TimeEncoder
@@ -31,15 +31,17 @@ func main() {
 	)
 	logger := zap.New(core)
 
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(10 * time.Second)
 
 	go func() {
 		for t := range ticker.C {
 			logger.Debug("now " + t.Format(time.ANSIC))
 		}
 	}()
-	time.Sleep(20*time.Second)
+	logger.Info("start...")
+	time.Sleep(2 * time.Minute)
 	ticker.Stop()
+	_ = rw.Close()
+	logger.Warn("write to clossed writer") // redirect to stderr
 }
-
 ```
